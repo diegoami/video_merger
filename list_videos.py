@@ -33,14 +33,14 @@ def build_segs(playl_dir):
     print(segs)
     return segs
 
-def save_segs_to_files(playl_dir, playl_out_dir, segs):
+def save_segs_to_files(playl_dir, playl_out_dir, segs, prefix, file_suffix):
     for index, seg in enumerate(segs):
-        file_name = f'list{index + 1}.txt'
+        file_name = f'{prefix}{index + 1}.txt'
         full_file_name = os.path.join(playl_out_dir, file_name)
         with open(full_file_name, 'w') as f:
             for file_name_tow in seg:
                 full_file_name_tow = os.path.join(playl_dir, file_name_tow)
-                f.write(f"file '{full_file_name_tow}'\n")
+                f.write(f"file '{full_file_name_tow}{file_suffix}'\n")
 
 
 if __name__ == "__main__":
@@ -58,13 +58,19 @@ if __name__ == "__main__":
             output_dir = conf_info["output_dir"]
             playl_dir = os.path.join(video_dir, playlist_id)
             list_dir = conf_info["list_dir"]
-
+            acc_video_dir = conf_info["acc_video_dir"]
             playl_out_dir = os.path.join(output_dir, playlist_id)
+            playl_acc_dir = os.path.join(acc_video_dir, playlist_id)
+            frames = conf_info["frames"]
             os.makedirs(playl_out_dir, exist_ok=True)
+            os.makedirs(playl_acc_dir, exist_ok=True)
+
+
             text_out_dir = os.path.join(os.getcwd(), list_dir)
             os.makedirs(text_out_dir, exist_ok=True)
 
             segs = build_segs(playl_dir)
-            save_segs_to_files(playl_dir, text_out_dir, segs)
+#            save_segs_to_files(playl_dir, text_out_dir, segs, 'list', '')
+            save_segs_to_files(playl_acc_dir, text_out_dir, segs, 'list_acc', '.mp4')
 
 
