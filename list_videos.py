@@ -33,13 +33,14 @@ def build_segs(playl_dir):
     print(segs)
     return segs
 
-def save_segs_to_files(playl_out_dir, segs):
+def save_segs_to_files(playl_dir, playl_out_dir, segs):
     for index, seg in enumerate(segs):
         file_name = f'list{index + 1}.txt'
         full_file_name = os.path.join(playl_out_dir, file_name)
         with open(full_file_name, 'w') as f:
             for file_name_tow in seg:
-                f.write(f"file '{file_name_tow}'\n")
+                full_file_name_tow = os.path.join(playl_dir, file_name_tow)
+                f.write(f"file '{full_file_name_tow}'\n")
 
 
 if __name__ == "__main__":
@@ -64,6 +65,6 @@ if __name__ == "__main__":
             os.makedirs(text_out_dir, exist_ok=True)
 
             segs = build_segs(playl_dir)
-            save_segs_to_files(text_out_dir, segs)
+            save_segs_to_files(playl_dir, text_out_dir, segs)
 
 

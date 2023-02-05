@@ -1,5 +1,7 @@
-video_dir: "/media/diego/One Touch/videos"
+video_dir: "/media/diego/one_touch/videos"
+acc_video_dir: "/media/diego/one_touch/acc_videos"
 playlist_id: "PLNP_nRm4k4jeAvgpcCC-Ic1DIbAe_gQT9"
 max_seg_width: 50000
 list_dir: "brandenburg"
-output_dir: "/media/diego/One Touch/timelapse"
+output_dir: "/media/diego/one_touch/timelapse"
+frames: 180
