@@ -2,7 +2,6 @@ import urllib.error
 
 import os
 
-import os
 import yaml
 import time
 import ffmpy
@@ -10,6 +9,38 @@ import argparse
 from os import listdir
 from os.path import isfile, join
 from ffprobe import FFProbe
+
+
+def build_segs(playl_dir):
+    onlyfiles = [f for f in listdir(playl_dir) if isfile(join(playl_dir, f))]
+    sfiles = sorted(onlyfiles, key=lambda x: int(x.split('_')[0]), reverse=False)
+    print(sfiles)
+    segs, run_length = [[]], 0
+    seg_index = 0
+    for sfile in sfiles:
+        segs[seg_index].append(sfile)
+        full_file = os.path.join(playl_dir, sfile)
+        metadata = FFProbe(full_file)
+
+        for stream in metadata.streams:
+            if stream.is_video():
+                print('{} has duration in seconds: {}'.format(sfile, stream.duration_seconds()))
+                run_length += stream.duration_seconds()
+                if run_length > max_seg_width:
+                    segs.append([])
+                    seg_index += 1
+                    run_length = 0
+    print(segs)
+    return segs
+
+def save_segs_to_files(playl_out_dir, segs):
+    for index, seg in enumerate(segs):
+        file_name = f'list{index + 1}.txt'
+        full_file_name = os.path.join(playl_out_dir, file_name)
+        with open(full_file_name, 'w') as f:
+            for file_name_tow in seg:
+                f.write(f"file '{file_name_tow}'\n")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -23,24 +54,16 @@ if __name__ == "__main__":
             video_dir = conf_info["video_dir"]
             playlist_id = conf_info["playlist_id"]
             max_seg_width = conf_info["max_seg_width"]
+            output_dir = conf_info["output_dir"]
             playl_dir = os.path.join(video_dir, playlist_id)
+            list_dir = conf_info["list_dir"]
 
-            onlyfiles = [f for f in listdir(playl_dir ) if isfile(join(playl_dir, f))]
-            sfiles = sorted(onlyfiles, key=lambda x: int(x.split('_')[0]), reverse=False)
-            print(sfiles)
-            segs, run_length = [[]], 0
-            seg_index = 0
-            for sfile in sfiles:
-                segs[seg_index].append(sfile)
-                full_file = os.path.join(playl_dir, sfile)
-                metadata = FFProbe(full_file)
+            playl_out_dir = os.path.join(output_dir, playlist_id)
+            os.makedirs(playl_out_dir, exist_ok=True)
+            text_out_dir = os.path.join(os.getcwd(), list_dir)
+            os.makedirs(text_out_dir, exist_ok=True)
 
-                for stream in metadata.streams:
-                    if stream.is_video():
-                        print('{} has duration in seconds: {}'.format(sfile, stream.duration_seconds()))
-                        run_length += stream.duration_seconds()
-                        if run_length > max_seg_width:
-                            segs.append([])
-                            seg_index += 1
-                            run_length = 0
-            print(segs)
+            segs = build_segs(playl_dir)
+            save_segs_to_files(text_out_dir, segs)
+
+
